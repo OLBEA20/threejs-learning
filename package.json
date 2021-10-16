@@ -1,18 +1,26 @@
 {
-  "name": "threejs-learning",
-  "version": "1.0.0",
-  "author": "Olivier",
-  "license": "MIT",
-  "private": true,
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
-  },
-  "devDependencies": {
-    "webpack": "^5.37.1",
-    "webpack-cli": "^4.7.0"
-  },
-  "dependencies": {
-    "lodash": "^4.17.21"
-  }
+    "name": "threejs-learning",
+    "version": "1.0.0",
+    "author": "Olivier",
+    "license": "MIT",
+    "private": true,
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "webpack"
+    },
+    "devDependencies": {
+        "@types/three": "^0.131.0",
+        "@types/lodash": "^4.14.172",
+        "css-loader": "^5.2.6",
+        "html-webpack-plugin": "^5.3.2",
+        "style-loader": "^3.0.0",
+        "ts-loader": "^9.2.5",
+        "typescript": "^4.3.5",
+        "webpack": "^5.37.1",
+        "webpack-cli": "^4.7.0"
+    },
+    "dependencies": {
+        "lodash": "^4.17.21",
+        "three": "^0.129.0"
+    }
 }
