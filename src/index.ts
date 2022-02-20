@@ -1,88 +1,53 @@
 import {
     AmbientLight,
     Color,
-    CylinderGeometry,
     DirectionalLight,
     DoubleSide,
     FogExp2,
     Mesh,
     MeshBasicMaterial,
-    MeshPhongMaterial,
-    PerspectiveCamera,
     PlaneGeometry,
     Scene,
     WebGLRenderer,
 } from "three";
-import { Animal } from "./Animal";
-import { AnimalSpawner } from "./AnimalSpawner";
-import { AnimalStateContext } from "./AnimalStateContext";
-import { DecidingNewDestinationState } from "./AnimalStates";
-import { CameraControls } from "./CameraControls";
+import { Animal } from "./animals/Animal";
+import { AnimalStateContext } from "./animals/AnimalStateContext";
+import { DecidingNewDestinationState } from "./animals/AnimalStates";
+import { initializeAnimalSpawner } from "./animals/initialize";
+import { CameraControls } from "./camera/CameraControls";
+import { updateCameraInfo } from "./camera/cameraInfo";
+import { initializeCamera } from "./camera/initialiaze";
+import { initializeHud } from "./hud/initialize";
 
 import "./index.css";
-import { World } from "./World";
+import { World } from "./world/World";
+
+const WORLD_SIZE = 16000;
+const NUMBER_OF_ANIMALS = 300;
 
 function component() {
-    const scene = new Scene();
-    scene.background = new Color(0x9ce1ff);
-    scene.fog = new FogExp2(0x99dbcc, 0.0003);
-    scene.add(...buildLights());
+    initializeHud();
 
-    const renderer = new WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    const speedFactorDisplay = document.createElement("div");
-    speedFactorDisplay.className = "speedFactorDisplay";
-    document.body.appendChild(speedFactorDisplay);
-
-    const camera = new PerspectiveCamera(
-        60,
-        window.innerWidth / window.innerHeight,
-        1,
-        5000
-    );
-    camera.lookAt(0, 0, 0);
-    camera.position.set(400, 200, 0);
-
-    const planeGeometry = new PlaneGeometry(16000, 16000);
-    const planeMaterial = new MeshBasicMaterial({
-        color: 0x00aa00,
-        side: DoubleSide,
-    });
-    const plane = new Mesh(planeGeometry, planeMaterial);
-    plane.rotation.set(Math.PI / 2, 0, 0);
-    plane.position.set(0, -15, 0);
-
-    scene.add(plane);
-
-    const controls = new CameraControls(camera, renderer.domElement);
-
-    const animalGeometry = new CylinderGeometry(10, 10, 30, 8, 1);
-    const animalMaterial = new MeshPhongMaterial({
-        color: 0x0000ff,
-        flatShading: true,
-    });
-
-    const animalSpawner = new AnimalSpawner(animalGeometry, animalMaterial);
+    const animalSpawner = initializeAnimalSpawner(WORLD_SIZE);
     const animalsContext: AnimalStateContext[] = [];
     const animals: Animal[] = [];
-    for (let i = 0; i < 300; i++) {
+
+    const scene = initializeScene();
+    for (let i = 0; i < NUMBER_OF_ANIMALS; i++) {
         const animal = animalSpawner.spawn();
         animals.push(animal);
-        animalsContext.push(
-            new AnimalStateContext(new DecidingNewDestinationState(), animal)
-        );
-        scene.add(animal.mesh);
+        animalsContext.push(new AnimalStateContext(new DecidingNewDestinationState(), animal));
+        animal.addTo(scene);
     }
-    const world = new World(animals);
 
+    const camera = initializeCamera();
+    const renderer = initializeRenderer();
+    const controls = new CameraControls(camera, renderer.domElement);
+
+    const world = new World(animals, [WORLD_SIZE, WORLD_SIZE]);
     function animate() {
         requestAnimationFrame(animate);
-        speedFactorDisplay.textContent = `Speed: ${controls.speedFactor.toString()} Position: ${camera.position.toArray()} Rotation: ${camera.rotation
-            .toArray()
-            .map((r) => (isNaN(Number(r)) ? r : Number(r).toFixed(2)))}`;
+        updateCameraInfo(controls);
 
         animalsContext.forEach((animal) => animal.update(world));
 
@@ -94,6 +59,16 @@ function component() {
 
 component();
 
+function initializeScene() {
+    const scene = new Scene();
+    scene.background = new Color(0x9ce1ff);
+    scene.fog = new FogExp2(0x99dbcc, 0.0002);
+    scene.add(...buildLights());
+    scene.add(buildGround());
+
+    return scene;
+}
+
 function buildLights() {
     const dirLight1 = new DirectionalLight(0xffffff);
     dirLight1.position.set(20, 20, 20);
@@ -104,4 +79,26 @@ function buildLights() {
     const ambientLight = new AmbientLight(0x555555);
 
     return [dirLight1, dirLight2, ambientLight];
+}
+
+function buildGround() {
+    const planeGeometry = new PlaneGeometry(WORLD_SIZE, WORLD_SIZE);
+    const planeMaterial = new MeshBasicMaterial({
+        color: 0x00aa00,
+        side: DoubleSide,
+    });
+    const plane = new Mesh(planeGeometry, planeMaterial);
+    plane.rotation.set(Math.PI / 2, 0, 0);
+    plane.position.set(0, -15, 0);
+
+    return plane;
+}
+
+function initializeRenderer() {
+    const renderer = new WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    return renderer;
 }

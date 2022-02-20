@@ -1,4 +1,6 @@
-import { Camera, Vector3 } from "three";
+import { Camera, Vector3, Quaternion, Euler } from "three";
+
+const ROTATION_ANGLE = Math.PI / 32;
 
 const TRANSLATION_CONTROLS: Record<string, Vector3> = {
     w: new Vector3(0, 0, -1),
@@ -26,21 +28,22 @@ export class CameraControls {
     move(event: KeyboardEvent) {
         const translation = TRANSLATION_CONTROLS[event.key];
         if (translation) {
+            const cameraRotation = new Quaternion().setFromEuler(this.camera.rotation);
             this.camera.position.add(
-                translation.clone().multiplyScalar(this.speedFactor)
+                translation.clone().applyQuaternion(cameraRotation).multiplyScalar(this.speedFactor)
             );
         }
     }
 
     rotate(event: KeyboardEvent) {
         if (event.key === "ArrowRight") {
-            this.camera.rotateY(-Math.PI / 8);
+            this.camera.rotateOnWorldAxis(new Vector3(0, 1, 0), -ROTATION_ANGLE);
         } else if (event.key === "ArrowLeft") {
-            this.camera.rotateY(Math.PI / 8);
+            this.camera.rotateOnWorldAxis(new Vector3(0, 1, 0), ROTATION_ANGLE);
         } else if (event.key === "ArrowDown") {
-            this.camera.rotateX(Math.PI / 8);
+            this.camera.rotateX(-ROTATION_ANGLE);
         } else if (event.key === "ArrowUp") {
-            this.camera.rotateX(-Math.PI / 8);
+            this.camera.rotateX(ROTATION_ANGLE);
         }
     }
 
@@ -52,4 +55,18 @@ export class CameraControls {
         }
         this.speedFactor = Math.min(50, Math.max(0, this.speedFactor));
     }
+
+    info(): CameraInfo {
+        return {
+            speed: this.speedFactor,
+            position: this.camera.position,
+            rotation: this.camera.rotation,
+        };
+    }
+}
+
+export interface CameraInfo {
+    speed: number;
+    position: Vector3;
+    rotation: Euler;
 }

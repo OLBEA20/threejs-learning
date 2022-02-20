@@ -1,7 +1,8 @@
 import { Vector3 } from "three";
-import { Animal } from "./Animal";
+import { Animal, NoMoreEnergy } from "./Animal";
 import { AnimalState } from "./AnimalState";
-import { World } from "./World";
+import { World } from "../world/World";
+import { generatePosition } from "../commons/generatePosition";
 
 export class MovingState implements AnimalState {
     destination: Vector3;
@@ -10,7 +11,7 @@ export class MovingState implements AnimalState {
         this.destination = destination;
     }
 
-    update(animal: Animal, world: World) {
+    update(animal: Animal, world: World): AnimalState {
         if (animal.isAt(this.destination)) {
             return new DecidingNewDestinationState();
         }
@@ -23,33 +24,26 @@ export class MovingState implements AnimalState {
         const zMovement = delta.z > 1 ? 1 : delta.z < -1 ? -1 : delta.z;
         try {
             animal.move(new Vector3(xMovement, 0, zMovement));
-        } catch {
-            return new FreezeState();
+        } catch (error) {
+            if (error instanceof NoMoreEnergy) {
+                return new FreezeState();
+            }
         }
         return this;
     }
 }
 
 export class DecidingNewDestinationState implements AnimalState {
-    update() {
-        return new MovingState(newDestination());
+    update(_: Animal, world: World) {
+        return new MovingState(generatePosition(...world.dimensions));
     }
-}
-
-function newDestination() {
-    return new Vector3(
-        Math.random() * 16000 - 8000,
-        0,
-        Math.random() * 16000 - 8000
-    );
 }
 
 export class FreezeState implements AnimalState {
-    constructor() {
-        console.log("Freeze!!!");
-    }
+    constructor() {}
 
-    update() {
+    update(animal: Animal) {
+        animal.kill();
         return this;
     }
 }

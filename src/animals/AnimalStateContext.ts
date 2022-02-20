@@ -1,6 +1,6 @@
 import { Animal } from "./Animal";
 import { AnimalState } from "./AnimalState";
-import { World } from "./World";
+import { World } from "../world/World";
 
 export class AnimalStateContext {
     state: AnimalState;

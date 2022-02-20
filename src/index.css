@@ -1,14 +1,31 @@
-body {
-    margin: 0px;
+:root {
+    --main-spacing: 8px;
+    --main-background-color: 37, 43, 46;
+    --main-border-radius: 4px;
 }
 
-.speedFactorDisplay {
+body {
+    padding: 0;
+    margin: 0;
+}
+
+.hud {
     position: absolute;
-    top: 10px;
-    width: 100%;
+    padding: var(--main-spacing);
+}
+
+.cameraInfoContainer {
     font-size: larger;
     font-weight: 700;
-    text-align: center;
     z-index: 100;
-    display: block;
+    list-style-type: none;
+    padding: var(--main-spacing);
+    margin: 0px;
+    background-color: rgba(var(--main-background-color), 0.8);
+    border-radius: var(--main-border-radius);
+}
+
+.cameraInfoItem {
+    opacity: 1;
+    color: #ffffff;
 }
