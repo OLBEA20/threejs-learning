@@ -10,6 +10,13 @@ export class World {
     }
 
     areAnimalsCloseTo(animal: Animal, radius: number): boolean {
-        return this.animals.filter((a) => a !== animal).some((a) => a.isCloseTo(animal, radius));
+        return this.animals.some((a) => a !== animal && a.isCloseTo(animal, radius));
+    }
+
+    stats(): WorldStats {
+        return {  
+            animalsAliveCount: this.animals.filter((animal) => animal.isAlive()).length,
+            animalsDeadCount: this.animals.filter((animal) => !animal.isAlive()).length
+        }
     }
 }

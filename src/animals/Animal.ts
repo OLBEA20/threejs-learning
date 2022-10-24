@@ -51,6 +51,10 @@ export class Animal {
     addTo(scene: Scene) {
         scene.add(this.mesh);
     }
+
+    isAlive() {
+        return this.alive;
+    }
 }
 
 export class NoMoreEnergy extends Error {

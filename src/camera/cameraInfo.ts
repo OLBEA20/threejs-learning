@@ -13,8 +13,13 @@ export function updateCameraInfo(controls: CameraControls) {
 }
 
 export function buildCameraInfoElement(): HTMLElement {
-    const container = document.createElement("ul");
-    container.className = "cameraInfoContainer";
+    const cameraInformationContainer = document.createElement("div")
+
+    const sectionTitle = document.createElement("h3")
+    sectionTitle.textContent = "Camera Information"
+    cameraInformationContainer.appendChild(sectionTitle)
+    cameraInformationContainer.className = "cameraInfoContainer"
+
 
     const speedElement = document.createElement("li");
     speedElement.className = "cameraInfoItem";
@@ -28,9 +33,13 @@ export function buildCameraInfoElement(): HTMLElement {
     rotationElement.className = "cameraInfoItem";
     rotationElement.id = "rotation";
 
+    const container = document.createElement("ul");
+    container.className = "cameraInfoList"
     container.appendChild(speedElement);
     container.appendChild(positionElement);
     container.appendChild(rotationElement);
 
-    return container;
+    cameraInformationContainer.appendChild(container)
+
+    return cameraInformationContainer;
 }

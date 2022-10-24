@@ -18,14 +18,22 @@ body {
     font-size: larger;
     font-weight: 700;
     z-index: 100;
-    list-style-type: none;
-    padding: var(--main-spacing);
     margin: 0px;
     background-color: rgba(var(--main-background-color), 0.8);
     border-radius: var(--main-border-radius);
+    color: #ffffff;
+    padding: var(--main-spacing);
+}
+
+.cameraInfoList {
+    list-style-type: none;
+    padding: var(--main-spacing);
 }
 
 .cameraInfoItem {
     opacity: 1;
-    color: #ffffff;
+}
+
+h3 {
+    margin: 0px;
 }
